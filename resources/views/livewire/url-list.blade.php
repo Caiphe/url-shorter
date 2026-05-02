@@ -16,6 +16,7 @@
                 <tr>
                     <th class="px-4 py-3 text-start font-medium text-zinc-600 dark:text-zinc-400">{{ __('Destination') }}</th>
                     <th class="px-4 py-3 text-start font-medium text-zinc-600 dark:text-zinc-400">{{ __('Short link') }}</th>
+                    <th class="px-4 py-3 text-center font-medium text-zinc-600 dark:text-zinc-400">{{ __('QR code') }}</th>
                     <th class="px-4 py-3 text-end font-medium text-zinc-600 dark:text-zinc-400">{{ __('Total clicks') }}</th>
                     <th class="px-4 py-3 text-end font-medium text-zinc-600 dark:text-zinc-400">{{ __('Recent (7d)') }}</th>
                     <th class="px-4 py-3 text-end font-medium text-zinc-600 dark:text-zinc-400">{{ __('Actions') }}</th>
@@ -36,6 +37,25 @@
                             >
                                 {{ route('redirect', ['shortCode' => $url->short_code]) }}
                             </a>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap align-top">
+                            <div class="flex flex-col items-center gap-2">
+                                <img
+                                    src="{{ route('urls.qr', ['id' => $url->id]) }}"
+                                    alt="{{ __('QR Code') }}"
+                                    width="64"
+                                    height="64"
+                                    class="rounded shadow-sm"
+                                    loading="lazy"
+                                >
+                                <a
+                                    href="{{ route('urls.qr.download', ['id' => $url->id]) }}"
+                                    download
+                                    class="text-xs text-slate-400 transition-colors hover:text-slate-600"
+                                >
+                                    {{ __('Download') }}
+                                </a>
+                            </div>
                         </td>
                         <td class="px-4 py-3 text-end tabular-nums text-zinc-900 dark:text-zinc-100">
                             {{ $url->total_clicks }}
@@ -61,7 +81,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="px-4 py-8 text-center text-zinc-500 dark:text-zinc-400">
+                        <td colspan="6" class="px-4 py-8 text-center text-zinc-500 dark:text-zinc-400">
                             @if ($search !== '')
                                 {{ __('No links match your search.') }}
                             @else

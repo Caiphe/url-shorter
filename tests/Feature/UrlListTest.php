@@ -71,3 +71,26 @@ test('url list does not show another users links', function () {
         ->test('url-list')
         ->assertDontSee('owner1', escape: false);
 });
+
+test('url list qr column uses lazy images top aligned cells and download links without target blank', function () {
+    $user = User::factory()->create();
+    $url = Url::factory()->for($user)->create(['short_code' => 'qrcol1']);
+
+    $html = Livewire::actingAs($user)
+        ->test('url-list')
+        ->html();
+
+    expect($html)->toContain('loading="lazy"');
+    expect($html)->toContain('whitespace-nowrap align-top');
+
+    expect(preg_match_all(
+        '/<a\s[^>]*href="[^"]*\/urls\/'.$url->id.'\/qr\/download"[^>]*>/',
+        $html,
+        $downloadAnchors,
+        PREG_SET_ORDER
+    ))->toBeGreaterThan(0);
+
+    foreach ($downloadAnchors as [$fullTag]) {
+        expect($fullTag)->not->toContain('target=');
+    }
+});
