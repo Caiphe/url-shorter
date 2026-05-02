@@ -1,7 +1,7 @@
 <?php
 
-test('returns a successful response', function () {
-    $response = $this->get(route('home'));
+test('login screen can be reached without authentication', function () {
+    $response = $this->get(route('login'));
 
     $response->assertOk();
 });

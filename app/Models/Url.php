@@ -17,6 +17,13 @@ class Url extends Model
     /** @use HasFactory<UrlFactory> */
     use HasFactory;
 
+    protected static function booted(): void
+    {
+        static::addGlobalScope('active', function (Builder $query): void {
+            $query->where((new static)->getTable().'.is_active', true);
+        });
+    }
+
     /**
      * @param  Builder<static>  $query
      * @return Builder<static>
@@ -33,6 +40,15 @@ class Url extends Model
     public function scopeOwnedBy(Builder $query, int $userId): Builder
     {
         return $query->where('user_id', $userId);
+    }
+
+    /**
+     * @param  Builder<static>  $query
+     * @return Builder<static>
+     */
+    public function scopeForUser(Builder $query, int $userId): Builder
+    {
+        return $query->ownedBy($userId);
     }
 
     public function user(): BelongsTo

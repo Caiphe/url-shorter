@@ -48,7 +48,7 @@ test('url scopes active and owned by filter correctly', function () {
     ]);
 
     expect(Url::query()->active()->count())->toBe(2);
-    expect(Url::query()->ownedBy($user->id)->count())->toBe(2);
+    expect(Url::withoutGlobalScopes()->ownedBy($user->id)->count())->toBe(2);
 });
 
 test('url accessors count clicks by via_qr', function () {
