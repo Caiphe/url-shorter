@@ -60,7 +60,7 @@ class ShortenUrl extends Component
         }
 
         $this->reset('url');
-        $this->dispatch('link-created');
+        $this->dispatch('url-created');
     }
 
     public function render(): View

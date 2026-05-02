@@ -28,7 +28,7 @@ test('shorten persists url clears input dispatches link created and exposes shor
         ->call('shorten')
         ->assertHasNoErrors()
         ->assertSet('url', '')
-        ->assertDispatched('link-created');
+        ->assertDispatched('url-created');
 
     expect($test->get('shortenedUrl'))->not->toBeEmpty();
 

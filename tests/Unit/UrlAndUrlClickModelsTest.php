@@ -51,7 +51,7 @@ test('url scopes active and owned by filter correctly', function () {
     expect(Url::withoutGlobalScopes()->ownedBy($user->id)->count())->toBe(2);
 });
 
-test('url accessors count clicks by via_qr', function () {
+test('url click counts respect via_qr', function () {
     $user = User::factory()->create();
     $url = Url::factory()->for($user)->create([
         'original_url' => 'https://example.com',
@@ -63,9 +63,9 @@ test('url accessors count clicks by via_qr', function () {
 
     $url->refresh();
 
-    expect($url->total_clicks)->toBe(3);
-    expect($url->via_direct_clicks)->toBe(2);
-    expect($url->via_qr_clicks)->toBe(1);
+    expect($url->clicks()->count())->toBe(3);
+    expect($url->clicks()->where('via_qr', false)->count())->toBe(2);
+    expect($url->clicks()->where('via_qr', true)->count())->toBe(1);
 });
 
 test('url click belongs to url', function () {

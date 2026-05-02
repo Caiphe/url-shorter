@@ -1,0 +1,73 @@
+<?php
+
+use App\Models\Url;
+use App\Models\UrlClick;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
+
+uses(RefreshDatabase::class);
+
+test('url list shows aggregated click counts from withCount', function () {
+    $user = User::factory()->create();
+    $url = Url::factory()->for($user)->create([
+        'original_url' => 'https://unique-destination.example/path',
+        'short_code' => 'uniq01',
+    ]);
+    UrlClick::factory()->count(11)->for($url)->create();
+
+    Livewire::actingAs($user)
+        ->test('url-list')
+        ->assertSee('uniq01', escape: false)
+        ->assertSee('11', escape: false);
+});
+
+test('url list search filters by destination or short code', function () {
+    $user = User::factory()->create();
+    Url::factory()->for($user)->create([
+        'original_url' => 'https://alpha-only.example/page',
+        'short_code' => 'aaaaaa',
+    ]);
+    Url::factory()->for($user)->create([
+        'original_url' => 'https://beta-only.example/page',
+        'short_code' => 'bbbbbb',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test('url-list')
+        ->set('search', 'alpha-only')
+        ->assertSee('aaaaaa', escape: false)
+        ->assertDontSee('bbbbbb', escape: false);
+});
+
+test('url list delete removes the url for the authenticated owner', function () {
+    $user = User::factory()->create();
+    $url = Url::factory()->for($user)->create(['short_code' => 'delme1']);
+
+    Livewire::actingAs($user)
+        ->test('url-list')
+        ->call('deleteUrl', $url->id);
+
+    expect(Url::withoutGlobalScopes()->whereKey($url->id)->exists())->toBeFalse();
+});
+
+test('url list responds to url created event', function () {
+    $user = User::factory()->create();
+    Url::factory()->for($user)->create(['short_code' => 'first1']);
+
+    Livewire::actingAs($user)
+        ->test('url-list')
+        ->assertSee('first1', escape: false)
+        ->dispatch('url-created')
+        ->assertOk();
+});
+
+test('url list does not show another users links', function () {
+    $owner = User::factory()->create();
+    $other = User::factory()->create();
+    Url::factory()->for($owner)->create(['short_code' => 'owner1']);
+
+    Livewire::actingAs($other)
+        ->test('url-list')
+        ->assertDontSee('owner1', escape: false);
+});

@@ -5,7 +5,6 @@ namespace App\Models;
 use Database\Factories\UrlFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -59,30 +58,6 @@ class Url extends Model
     public function clicks(): HasMany
     {
         return $this->hasMany(UrlClick::class);
-    }
-
-    /**
-     * @return Attribute<int, never>
-     */
-    protected function totalClicks(): Attribute
-    {
-        return Attribute::get(fn (): int => (int) $this->clicks()->count());
-    }
-
-    /**
-     * @return Attribute<int, never>
-     */
-    protected function viaDirectClicks(): Attribute
-    {
-        return Attribute::get(fn (): int => (int) $this->clicks()->where('via_qr', false)->count());
-    }
-
-    /**
-     * @return Attribute<int, never>
-     */
-    protected function viaQrClicks(): Attribute
-    {
-        return Attribute::get(fn (): int => (int) $this->clicks()->where('via_qr', true)->count());
     }
 
     /**

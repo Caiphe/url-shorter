@@ -1,6 +1,6 @@
 <x-layouts::app :title="__('Analytics')">
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-6">
         <flux:heading size="lg">{{ __('URL analytics') }}</flux:heading>
-        <flux:text>{{ __('URL ID: :id', ['id' => $urlId]) }}</flux:text>
+        <livewire:url-chart :url-id="$urlId" />
     </div>
 </x-layouts::app>
