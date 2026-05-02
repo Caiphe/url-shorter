@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth')->group(function (): void {
+    Route::view('/', 'home')->name('home');
     Route::view('dashboard', 'dashboard')->name('dashboard');
 
     Route::get('urls/{id}/analytics', function (int $id) {

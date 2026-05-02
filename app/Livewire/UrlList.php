@@ -16,6 +16,10 @@ class UrlList extends Component
 
     public string $search = '';
 
+    public ?int $qrPreviewUrlId = null;
+
+    public string $qrPreviewShortCode = '';
+
     public function updatingSearch(): void
     {
         $this->resetPage();
@@ -64,8 +68,35 @@ class UrlList extends Component
             ->first();
 
         if ($url !== null) {
+            if ($this->qrPreviewUrlId === $url->id) {
+                $this->modal('qr-preview')->close();
+                $this->reset('qrPreviewUrlId', 'qrPreviewShortCode');
+            }
+
             $url->delete();
         }
+    }
+
+    public function openQrPreview(int $urlId): void
+    {
+        $url = Url::query()
+            ->withoutGlobalScopes()
+            ->where('user_id', (int) auth()->id())
+            ->whereKey($urlId)
+            ->first();
+
+        if ($url === null) {
+            return;
+        }
+
+        $this->qrPreviewUrlId = $url->id;
+        $this->qrPreviewShortCode = $url->short_code;
+        $this->modal('qr-preview')->show();
+    }
+
+    public function closeQrPreview(): void
+    {
+        $this->reset('qrPreviewUrlId', 'qrPreviewShortCode');
     }
 
     public function render(): View

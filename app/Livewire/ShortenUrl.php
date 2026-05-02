@@ -15,6 +15,11 @@ class ShortenUrl extends Component
 
     public string $shortenedUrl = '';
 
+    public function startAnother(): void
+    {
+        $this->reset('shortenedUrl');
+    }
+
     public function shorten(UrlShortenerService $service): void
     {
         $this->resetErrorBag('url');

@@ -38,23 +38,26 @@
                                 {{ route('redirect', ['shortCode' => $url->short_code]) }}
                             </a>
                         </td>
-                        <td class="px-4 py-3 whitespace-nowrap align-top">
-                            <div class="flex flex-col items-center gap-2">
-                                <img
-                                    src="{{ route('urls.qr', ['id' => $url->id]) }}"
-                                    alt="{{ __('QR Code') }}"
-                                    width="64"
-                                    height="64"
-                                    class="rounded shadow-sm"
-                                    loading="lazy"
-                                >
-                                <a
-                                    href="{{ route('urls.qr.download', ['id' => $url->id]) }}"
-                                    download
-                                    class="text-xs text-slate-400 transition-colors hover:text-slate-600"
-                                >
-                                    {{ __('Download') }}
-                                </a>
+                        <td class="whitespace-nowrap align-top px-4 py-3">
+                            <div class="flex flex-col items-center gap-1">
+                                <flux:tooltip :content="__('Open preview & download')" position="top">
+                                    <button
+                                        type="button"
+                                        wire:click="openQrPreview({{ $url->id }})"
+                                        class="group rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-800"
+                                    >
+                                        <span class="sr-only">{{ __('Open QR code preview') }}</span>
+                                        <img
+                                            src="{{ route('urls.qr', ['id' => $url->id]) }}"
+                                            alt=""
+                                            width="64"
+                                            height="64"
+                                            loading="lazy"
+                                            class="rounded-lg shadow-sm ring-1 ring-zinc-200/80 transition group-hover:ring-2 group-hover:ring-indigo-400/60 dark:ring-zinc-600 dark:group-hover:ring-indigo-400/50"
+                                        >
+                                    </button>
+                                </flux:tooltip>
+                                <flux:text size="sm" class="text-zinc-400 dark:text-zinc-500">{{ __('Tap to enlarge') }}</flux:text>
                             </div>
                         </td>
                         <td class="px-4 py-3 text-end tabular-nums text-zinc-900 dark:text-zinc-100">
@@ -93,6 +96,58 @@
             </tbody>
         </table>
     </div>
+
+    <flux:modal
+        name="qr-preview"
+        variant="floating"
+        class="max-w-md !p-0 sm:max-w-lg"
+        wire:close="closeQrPreview"
+    >
+        @if ($qrPreviewUrlId !== null)
+            <div class="flex flex-col">
+                <div class="border-b border-zinc-200 px-6 pb-4 pt-5 dark:border-zinc-700">
+                    <flux:heading size="lg">{{ __('QR code') }}</flux:heading>
+                    <flux:subheading class="mt-1 font-mono text-sm">
+                        {{ $qrPreviewShortCode }}
+                    </flux:subheading>
+                </div>
+
+                <div class="flex flex-col items-center gap-3 px-6 py-8">
+                    <div
+                        class="rounded-2xl border border-zinc-200 bg-white p-5 shadow-inner dark:border-zinc-600 dark:bg-zinc-100"
+                    >
+                        <img
+                            src="{{ route('urls.qr', ['id' => $qrPreviewUrlId]) }}"
+                            alt="{{ __('QR code for :code', ['code' => $qrPreviewShortCode]) }}"
+                            width="280"
+                            height="280"
+                            class="size-56 sm:size-64"
+                            loading="eager"
+                        >
+                    </div>
+                    <flux:text size="sm" class="max-w-xs text-center text-zinc-500 dark:text-zinc-400">
+                        {{ __('Scanning opens your short link via the QR path so clicks are tracked.') }}
+                    </flux:text>
+                </div>
+
+                <div
+                    class="flex flex-col gap-3 border-t border-zinc-200 bg-zinc-50 px-6 py-5 dark:border-zinc-700 dark:bg-zinc-900/60"
+                >
+                    <flux:button
+                        variant="primary"
+                        class="w-full"
+                        icon="arrow-down-tray"
+                        :href="route('urls.qr.download', ['id' => $qrPreviewUrlId])"
+                    >
+                        {{ __('Download PNG') }}
+                    </flux:button>
+                    <flux:modal.close>
+                        <flux:button variant="ghost" class="w-full">{{ __('Close') }}</flux:button>
+                    </flux:modal.close>
+                </div>
+            </div>
+        @endif
+    </flux:modal>
 
     <div>
         {{ $urls->links() }}

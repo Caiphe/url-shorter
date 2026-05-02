@@ -34,3 +34,16 @@ test('shorten persists url clears input dispatches link created and exposes shor
 
     expect(Url::withoutGlobalScopes()->where('user_id', $user->id)->count())->toBe(1);
 });
+
+test('start another clears the short link and shows the shorten form again', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    Livewire::test('shorten-url')
+        ->set('url', 'https://example.com/another-page')
+        ->call('shorten')
+        ->assertHasNoErrors()
+        ->assertSet('shortenedUrl', fn (string $value): bool => $value !== '')
+        ->call('startAnother')
+        ->assertSet('shortenedUrl', '');
+});
